@@ -13,7 +13,7 @@ Code Vault aims to be the ultimate code snippet management platform for develope
 - [ ] **User Authentication & Authorization**
 
   - [ ] Sign up/Sign in with email/password
-  - [ ] OAuth integration (GitHub, Google, Microsoft)
+  - [x] OAuth integration (GitHub, Google, Microsoft)
   - [ ] User profile management
   - [ ] Password reset functionality
 
@@ -92,15 +92,15 @@ Code Vault aims to be the ultimate code snippet management platform for develope
 
 ### Backend & Database
 
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js
-- **File Storage**: AWS S3 or Vercel Blob
-- **Search**: PostgreSQL Full-Text Search or Algolia
-- **Caching**: Redis for session management
+- **Backend**: Convex (Real-time database and backend functions)
+- **Authentication**: Clerk (User management and authentication)
+- **File Storage**: Convex File Storage or Vercel Blob
+- **Search**: Convex Full-Text Search or Algolia
+- **Real-time**: Built-in Convex real-time subscriptions
 
 ### Infrastructure
 
-- **Hosting**: Vercel (Frontend) + Railway/Supabase (Backend)
+- **Hosting**: Vercel (Frontend) + Convex (Backend)
 - **CDN**: Vercel Edge Network
 - **Monitoring**: Vercel Analytics + Sentry
 - **CI/CD**: GitHub Actions
@@ -110,22 +110,23 @@ Code Vault aims to be the ultimate code snippet management platform for develope
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
 │   ├── (dashboard)/       # Main application routes
-│   ├── api/               # API routes
 │   └── globals.css        # Global styles
 ├── components/            # Reusable UI components
 │   ├── ui/               # Base UI components
 │   ├── editor/           # Code editor components
 │   └── layout/           # Layout components
+├── convex/               # Convex backend functions
+│   ├── snippets.ts       # Snippet CRUD operations
+│   ├── tags.ts          # Tag management
+│   └── collections.ts    # Collection operations
 ├── lib/                  # Utility functions
-│   ├── auth.ts           # Authentication config
-│   ├── db.ts             # Database connection
-│   └── utils.ts          # Helper functions
-├── hooks/                 # Custom React hooks
-├── store/                # State management
-├── types/                # TypeScript type definitions
-└── styles/               # Additional styles
+│   ├── convex.ts        # Convex client setup
+│   └── utils.ts         # Helper functions
+├── hooks/                # Custom React hooks
+├── store/               # State management
+├── types/               # TypeScript type definitions
+└── styles/              # Additional styles
 ```
 
 ## 🚀 Getting Started
@@ -134,7 +135,8 @@ src/
 
 - Node.js 18+
 - pnpm (recommended) or npm
-- PostgreSQL database
+- Convex account (free tier available)
+- Clerk account (free tier available)
 
 ### Installation
 
@@ -151,27 +153,34 @@ src/
    pnpm install
    ```
 
-3. **Set up environment variables**
+3. **Set up Convex**
+
+   ```bash
+   pnpm convex dev
+   # Follow the setup instructions to create a new Convex project
+   ```
+
+4. **Set up Clerk**
+
+   ```bash
+   # Create a new Clerk application at https://clerk.com
+   # Copy your Clerk keys to .env.local
+   ```
+
+5. **Set up environment variables**
 
    ```bash
    cp .env.example .env.local
-   # Edit .env.local with your configuration
+   # Add your Convex and Clerk keys to .env.local
    ```
 
-4. **Set up the database**
-
-   ```bash
-   pnpm db:push
-   pnpm db:seed
-   ```
-
-5. **Start the development server**
+6. **Start the development server**
 
    ```bash
    pnpm dev
    ```
 
-6. **Open your browser**
+7. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 🛠️ Development Scripts
@@ -187,15 +196,10 @@ pnpm lint            # Run Biome linter
 pnpm format          # Format code with Biome
 pnpm type-check      # Run TypeScript type checking
 
-# Database
-pnpm db:push         # Push schema changes to database
-pnpm db:seed         # Seed database with sample data
-pnpm db:studio       # Open Prisma Studio
-
-# Testing
-pnpm test            # Run unit tests
-pnpm test:e2e        # Run end-to-end tests
-pnpm test:coverage   # Run tests with coverage
+# Convex
+pnpm convex dev      # Start Convex development server
+pnpm convex deploy   # Deploy Convex functions to production
+pnpm convex dashboard # Open Convex dashboard
 ```
 
 ## 🎨 Design System
@@ -222,78 +226,119 @@ pnpm test:coverage   # Run tests with coverage
 - Mobile-first responsive design
 - Dark/light theme support
 
-## 📊 Database Schema
+## 📊 Convex Schema
 
-### Core Entities
+### Core Tables
 
-```sql
-Users
-├── id (UUID, Primary Key)
-├── email (String, Unique)
-├── name (String)
-├── avatar (String, Optional)
-├── createdAt (DateTime)
-└── updatedAt (DateTime)
+```typescript
+// convex/schema.ts
+import { defineSchema, defineTable } from 'convex/server';
+import { v } from 'convex/values';
 
-Snippets
-├── id (UUID, Primary Key)
-├── title (String)
-├── description (Text, Optional)
-├── content (Text)
-├── language (String)
-├── isPublic (Boolean)
-├── userId (UUID, Foreign Key)
-├── createdAt (DateTime)
-└── updatedAt (DateTime)
+export default defineSchema({
+  snippets: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    content: v.string(),
+    language: v.string(),
+    isPublic: v.boolean(),
+    userId: v.id('users'),
+    tags: v.array(v.id('tags')),
+    collectionId: v.optional(v.id('collections')),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_public', ['isPublic'])
+    .index('by_language', ['language'])
+    .searchIndex('search_snippets', {
+      searchField: 'title',
+      filterFields: ['userId', 'isPublic', 'language'],
+    }),
 
-Tags
-├── id (UUID, Primary Key)
-├── name (String, Unique)
-├── color (String)
-└── createdAt (DateTime)
+  tags: defineTable({
+    name: v.string(),
+    color: v.string(),
+    userId: v.id('users'),
+    createdAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_name', ['name']),
 
-Collections
-├── id (UUID, Primary Key)
-├── name (String)
-├── description (Text, Optional)
-├── userId (UUID, Foreign Key)
-├── isPublic (Boolean)
-└── createdAt (DateTime)
+  collections: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    isPublic: v.boolean(),
+    userId: v.id('users'),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_public', ['isPublic']),
+});
 ```
+
+### User Management
+
+- **Users**: Managed by Clerk (no custom user table needed)
+- **Authentication**: Handled entirely by Clerk
+- **User ID**: Retrieved from Clerk's `auth().userId`
+
+## 🚀 Why Convex + Clerk?
+
+### Convex Benefits
+
+- **Real-time by default**: Automatic subscriptions and live updates
+- **Type-safe**: Full TypeScript support with generated types
+- **No API routes needed**: Direct function calls from frontend
+- **Built-in authorization**: User context in every function
+- **Automatic scaling**: Handles traffic spikes seamlessly
+- **File storage**: Built-in file upload and management
+- **Search**: Full-text search with filters
+
+### Clerk Benefits
+
+- **Complete auth solution**: Sign-up, sign-in, password reset, OAuth
+- **User management**: Profiles, organizations, roles
+- **Security**: Industry-standard security practices
+- **Customizable UI**: Pre-built components or custom styling
+- **Multi-factor auth**: Built-in 2FA support
+- **Social logins**: GitHub, Google, Microsoft, etc.
 
 ## 🔒 Security Considerations
 
-- **Authentication**: JWT tokens with refresh mechanism
-- **Authorization**: Role-based access control (RBAC)
-- **Data Validation**: Server-side validation with Zod
-- **Rate Limiting**: API rate limiting with Upstash Redis
+- **Authentication**: Clerk handles all authentication securely
+- **Authorization**: Convex built-in authorization with user context
+- **Data Validation**: Convex schema validation and TypeScript types
+- **Rate Limiting**: Built-in Convex rate limiting
 - **Content Security**: XSS protection and sanitization
-- **Privacy**: GDPR compliance and data encryption
+- **Privacy**: GDPR compliance with Clerk and Convex
+- **Real-time Security**: Convex subscriptions with user-based filtering
 
 ## 🚀 Deployment
 
 ### Production Environment
 
 - **Frontend**: Vercel (automatic deployments from main branch)
-- **Database**: Supabase or PlanetScale
-- **File Storage**: Vercel Blob or AWS S3
+- **Backend**: Convex (managed backend with automatic scaling)
+- **Authentication**: Clerk (managed authentication service)
+- **File Storage**: Convex File Storage or Vercel Blob
 - **Monitoring**: Vercel Analytics + Sentry
 
 ### Environment Variables
 
 ```bash
-# Database
-DATABASE_URL="postgresql://..."
+# Convex
+CONVEX_DEPLOYMENT="your-convex-deployment-url"
+NEXT_PUBLIC_CONVEX_URL="your-convex-url"
 
-# Authentication
-NEXTAUTH_SECRET="your-secret"
-NEXTAUTH_URL="https://your-domain.com"
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+CLERK_SECRET_KEY="your-clerk-secret-key"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
 
-# OAuth Providers
-GITHUB_CLIENT_ID="your-github-client-id"
-GITHUB_CLIENT_SECRET="your-github-client-secret"
-
-# File Storage
+# File Storage (Optional)
 BLOB_READ_WRITE_TOKEN="your-vercel-blob-token"
 ```
 
