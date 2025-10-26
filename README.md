@@ -12,9 +12,9 @@ Code Vault aims to be the ultimate code snippet management platform for develope
 
 - [ ] **User Authentication & Authorization**
 
-  - [ ] Sign up/Sign in with email/password
+  - [x] Sign up/Sign in with email/password
   - [x] OAuth integration (GitHub, Google, Microsoft)
-  - [ ] User profile management
+  - [x] User profile management
   - [ ] Password reset functionality
 
 - [ ] **Basic Snippet Management**
