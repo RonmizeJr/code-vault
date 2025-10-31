@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import {
-  SignedOut,
-  SignUpButton,
-  SignInButton,
-  UserButton,
-  SignedIn,
-} from '@clerk/nextjs';
+import { SignedOut, SignUpButton, SignInButton, SignedIn } from '@clerk/nextjs';
 import { Button } from '../ui/button';
 
 export default function Header() {
@@ -19,20 +13,20 @@ export default function Header() {
           CodeVault
         </Link>
         <div className='flex items-center space-x-4'>
-          <Link
-            href='#features'
-            className='text-muted-foreground hover:text-foreground transition-colors'
-          >
-            Features
-          </Link>
-          <Link
-            href='#pricing'
-            className='text-muted-foreground hover:text-foreground transition-colors'
-          >
-            Pricing
-          </Link>
           <SignedOut>
             <div className='flex items-center space-x-2'>
+              <Link
+                href='#features'
+                className='text-muted-foreground hover:text-foreground transition-colors'
+              >
+                Features
+              </Link>
+              <Link
+                href='#pricing'
+                className='text-muted-foreground hover:text-foreground transition-colors'
+              >
+                Pricing
+              </Link>
               <SignInButton>
                 <Button asChild size='sm'>
                   <Link href='/sign-in'>Sign In</Link>
@@ -49,7 +43,6 @@ export default function Header() {
             <Button asChild size='sm'>
               <Link href='/dashboard'>Dashboard</Link>
             </Button>
-            <UserButton />
           </SignedIn>
         </div>
       </div>

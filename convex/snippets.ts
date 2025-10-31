@@ -14,7 +14,7 @@ export const getMySnippets = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       // If not authenticated, return an empty array or throw an error depending on desired behavior
-      throw new Error('Not authenticated');
+      return [];
     }
 
     const userId = identity.subject; // Clerk's user ID is in 'subject'
