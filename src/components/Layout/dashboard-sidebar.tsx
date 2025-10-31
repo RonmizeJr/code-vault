@@ -49,7 +49,7 @@ export function DashboardSidebar() {
       {/* --- Header ---*/}
       <SidebarHeader>
         <Link
-          href='/dashbard'
+          href='/dashboard'
           className='flex items-center space-x-2 hover:opacity-80 transition-opacity'
         >
           <div className='w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center'>

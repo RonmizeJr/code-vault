@@ -8,7 +8,7 @@ export default function Header() {
     <nav className='fixed w-full z-10 bg-background/80 backdrop-blur-sm p-4 border-b border-border'>
       <div className='container mx-auto flex justify-between items-center'>
         <Link
-          href='/dashbard'
+          href='/'
           className='flex items-center space-x-2 hover:opacity-80 transition-opacity'
         >
           <div className='w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center'>
