@@ -44,7 +44,7 @@ export const getSnippetById = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error('Not authenticated');
+      return [];
     }
 
     const userId = identity.subject;
@@ -77,10 +77,9 @@ export const createSnippet = mutation({
     description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Ensure the user is authenticated
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error('Not authenticated');
+      return [];
     }
 
     const userId = identity.subject; // Clerk's user ID
@@ -121,7 +120,7 @@ export const updateSnippet = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error('Not authenticated');
+      return [];
     }
 
     const userId = identity.subject;
@@ -157,7 +156,7 @@ export const deleteSnippet = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error('Not authenticated');
+      return [];
     }
 
     const userId = identity.subject;

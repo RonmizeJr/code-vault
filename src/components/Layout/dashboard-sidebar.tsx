@@ -9,7 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from './ui/sidebar';
+} from '../ui/sidebar';
 import { Code2, Compass, Home, Plus, Settings } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { UserButton } from '@clerk/nextjs';
