@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'; // Assuming you added Card
+import { SignUpButton } from '@clerk/nextjs';
 // You might add an Alert Dialog for a "View Demo" if it's a modal
 // import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
@@ -32,13 +33,15 @@ export default function HomePage() {
             always in sync.
           </p>
           <div className='flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in-up animation-delay-1000'>
-            <Button
-              asChild
-              size='lg'
-              className='shadow-lg transform hover:scale-105 transition-all duration-300'
-            >
-              <Link href='/sign-up'>Get Started Free</Link>
-            </Button>
+            <SignUpButton>
+              <Button
+                asChild
+                size='lg'
+                className='shadow-lg transform hover:scale-105 transition-all duration-300'
+              >
+                <Link href='/sign-up'>Get Started Free</Link>
+              </Button>
+            </SignUpButton>
             {/* If "View Demo" is a modal */}
             {/* <AlertDialog>
                 <AlertDialogTrigger asChild>

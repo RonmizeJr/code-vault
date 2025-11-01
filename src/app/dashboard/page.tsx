@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Plus, Code2, Tag, Calendar } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { SearchForm } from '@/components/search-form';
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -53,10 +54,10 @@ export default function DashboardPage() {
   return (
     <div className='flex flex-col gap-8'>
       {/* --- Header --- */}
-      <div className='flex items-center justify-between'>
+      <div className='flex items-center justify-between mt-16 p-8'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Dashboard</h1>
-          <p className='text-muted-foreground mt-1'>
+          <p className='text-muted-foreground mt-1 font-semibold'>
             Welcome back {user?.firstName}! Here's your snippet library.
           </p>
         </div>
@@ -69,7 +70,7 @@ export default function DashboardPage() {
       </div>
 
       {/* --- Stats Grid --- */}
-      <div className='grid gap-4 md:grid-cols-3'>
+      <div className='grid gap-4 md:grid-cols-3 p-8'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
             <CardTitle className='text-sm font-medium'>
@@ -117,7 +118,7 @@ export default function DashboardPage() {
       </div>
 
       {/* --- Recent Snippets Table --- */}
-      <Card>
+      <Card className='p-8'>
         <CardHeader>
           <CardTitle>Recent Snippets</CardTitle>
           <CardDescription>

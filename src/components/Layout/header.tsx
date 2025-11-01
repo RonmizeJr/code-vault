@@ -5,7 +5,7 @@ import { Code2 } from 'lucide-react';
 
 export default function Header() {
   return (
-    <nav className='fixed w-full z-10 bg-background/80 backdrop-blur-sm p-4 border-b border-border'>
+    <nav className='fixed z-10 w-full h-16 bg-background/80 backdrop-blur-sm p-4 border-b border-border'>
       <div className='container mx-auto flex justify-between items-center'>
         <Link
           href='/'
